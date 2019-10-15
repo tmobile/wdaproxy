@@ -19,7 +19,7 @@ import (
 	accesslog "github.com/mash/go-accesslog"
 	flag "github.com/ogier/pflag"
 	"github.com/openatx/wdaproxy/web"
-	"github.com/qiniu/log"
+	"github.com/gobuild/log"
 	_ "github.com/shurcooL/vfsgen"
 )
 
@@ -156,11 +156,24 @@ func main() {
 		log.Printf("device name: %s", deviceName)
 
 		log.Printf("launch WebDriverAgent(dir=%s)", pWda)
-		c := exec.Command("xcodebuild",
-			"-verbose",
-			"-project", "WebDriverAgent.xcodeproj",
-			"-scheme", "WebDriverAgentRunner",
-			"-destination", "id="+udid, "test-without-building") // test-without-building
+		
+		var c *exec.Cmd
+		if fileExists("WebDriverAgent.xcodeproj") {
+      c = exec.Command("xcodebuild",
+        "-verbose",
+        "-project", "WebDriverAgent.xcodeproj",
+        "-scheme", "WebDriverAgentRunner",
+        "-destination", "id="+udid, "test-without-building") // test-without-building
+    } else {
+      xctestrunFile := findXctestrun(pWda)
+      if xctestrunFile == "" {
+        log.Fatal("Could not find WebDriverAgent.xcodeproj or xctestrun file")
+      }
+      c = exec.Command("xcodebuild",
+        "test-without-building",
+        "-xctestrun", xctestrunFile,
+        "-destination", "id="+udid )        
+    }
 		c.Dir, _ = filepath.Abs(pWda)
 		// Test Suite 'All tests' started at 2017-02-27 15:55:35.263
 		// Test Suite 'WebDriverAgentRunner.xctest' started at 2017-02-27 15:55:35.266
@@ -213,4 +226,34 @@ func main() {
 
 	log.Printf("Open webbrower with http://%s:%d", LocalIP(), lisPort)
 	log.Fatal(<-errC)
+}
+
+func findXctestrun(folder string) string {
+  var files []string
+  err := filepath.Walk(folder, func( file string, info os.FileInfo, err error ) error {
+    if info.IsDir() && folder != file {
+      return filepath.SkipDir
+    }
+    files = append( files, file )
+    return nil
+  } )
+  if err != nil {
+    log.Fatal(err)
+  }
+  xcFile := ""
+  for _, file := range files {
+    if strings.HasSuffix(file, ".xctestrun") {
+      xcFile = file
+      break
+    }
+  }
+  return xcFile
+}
+
+func fileExists(filename string) bool {
+  info, err := os.Stat(filename)
+  if os.IsNotExist(err) {
+      return false
+  }
+  return !info.IsDir()
 }
