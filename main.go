@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -35,6 +36,7 @@ var (
 	yosemiteServer string
 	yosemiteGroup  string
 	debug          bool
+	iosversion     string
 
 	rt        = mux.NewRouter()
 	udidNames = map[string]string{}
@@ -97,6 +99,7 @@ func main() {
 	flag.StringVarP(&udid, "udid", "u", "", "device udid")
 	flag.StringVarP(&pWda, "wda", "W", "", "WebDriverAgent project directory [optional]")
 	flag.BoolVarP(&debug, "debug", "d", false, "Open debug mode")
+	flag.StringVarP(&iosversion, "iosversion", "V", "", "IOS Version")
 
 	// flag.StringVarP(&yosemiteServer, "yosemite-server", "S",
 	// 	os.Getenv("YOSEMITE_SERVER"),
@@ -167,7 +170,7 @@ func main() {
     } else {
       xctestrunFile := findXctestrun(pWda)
       if xctestrunFile == "" {
-        log.Fatal("Could not find WebDriverAgent.xcodeproj or xctestrun file")
+        log.Fatal("Could not find WebDriverAgent.xcodeproj or xctestrun of sufficient version")
       }
       c = exec.Command("xcodebuild",
         "test-without-building",
@@ -240,11 +243,50 @@ func findXctestrun(folder string) string {
   if err != nil {
     log.Fatal(err)
   }
+  
+  versionMatch := false
+  var findMajor int64 = 0
+  var findMinor int64 = 0
+  var curMajor int64 = 100
+  var curMinor int64 = 100
+  if iosversion != "" {
+    parts := strings.Split( iosversion, "." )
+    findMajor, _ = strconv.ParseInt( parts[0], 10, 64 )
+    findMinor, _ = strconv.ParseInt( parts[1], 10, 64 )
+    versionMatch = true
+  }
+  
   xcFile := ""
   for _, file := range files {
-    if strings.HasSuffix(file, ".xctestrun") {
+    if ! strings.HasSuffix(file, ".xctestrun") {
+      continue
+    }
+    
+    if ! versionMatch {
       xcFile = file
       break
+    }
+    
+    r := regexp.MustCompile( `iphoneos([0-9]+)\.([0-9]+)` )
+    fileParts := r.FindSubmatch( []byte( file ) )
+    fileMajor, _ := strconv.ParseInt( string(fileParts[1]), 10, 64 )
+    fileMinor, _ := strconv.ParseInt( string(fileParts[2]), 10, 64 )
+    
+    // Find the smallest file version greater than or equal to the ios version
+    // Golang line continuation for long boolean expressions is horrible. :(
+    if ( // Checked file version smaller than current file version
+         fileMajor < curMajor ||
+         (
+           fileMajor == curMajor &&
+           fileMinor <= curMinor ) ) &&
+       ( // Checked file version greater or equal to ios version
+         fileMajor > findMajor ||
+         (
+           fileMajor == findMajor &&
+           fileMinor >= findMinor ) ) {
+      curMajor = fileMajor
+      curMinor = fileMinor
+      xcFile = file
     }
   }
   return xcFile
