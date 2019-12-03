@@ -31,6 +31,7 @@ func init() {
 var (
 	version        = "develop"
 	lisPort        = 8100
+	wdaPort        = 8100
 	pWda           string
 	udid           string
 	yosemiteServer string
@@ -96,6 +97,7 @@ func LocalIP() string {
 func main() {
 	showVer := flag.BoolP("version", "v", false, "Print version")
 	flag.IntVarP(&lisPort, "port", "p", 8100, "Proxy listen port")
+	flag.IntVarP(&wdaPort, "wdaport", "q", 8100, "Upstream WDA port")
 	flag.StringVarP(&udid, "udid", "u", "", "device udid")
 	flag.StringVarP(&pWda, "wda", "W", "", "WebDriverAgent project directory [optional]")
 	flag.BoolVarP(&debug, "debug", "d", false, "Open debug mode")
@@ -142,7 +144,7 @@ func main() {
 	}()
 	go func() {
 		log.Printf("launch iproxy (udid: %s)", strconv.Quote(udid))
-		c := exec.Command("iproxy", strconv.Itoa(freePort), "8100")
+		c := exec.Command("/usr/local/bin/iproxy", strconv.Itoa(freePort), strconv.Itoa(wdaPort))
 		if udid != "" {
 			c.Args = append(c.Args, udid)
 		}
@@ -188,6 +190,9 @@ func main() {
 		c.Stdout = writer
 		c.Stderr = writer
 		c.Stdin = os.Stdin
+		
+		portLine := fmt.Sprintf("USE_PORT=%d", wdaPort)
+		c.Env = append(os.Environ(), portLine)
 
 		bufrd := bufio.NewReader(pipeReader)
 		if err = c.Start(); err != nil {
