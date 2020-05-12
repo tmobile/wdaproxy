@@ -19,7 +19,7 @@ import (
 	"github.com/gorilla/mux"
 	accesslog "github.com/mash/go-accesslog"
 	flag "github.com/ogier/pflag"
-	"github.com/openatx/wdaproxy/web"
+	"github.com/nanoscopic/wdaproxy/web"
 	"github.com/gobuild/log"
 	_ "github.com/shurcooL/vfsgen"
 )
