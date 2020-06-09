@@ -140,22 +140,39 @@ func main() {
 		targetURL, _ := url.Parse("http://127.0.0.1:" + strconv.Itoa(freePort))
 		rt.HandleFunc("/wd/hub/{path:.*}", NewAppiumProxyHandlerFunc(targetURL))
 		rt.HandleFunc("/{path:.*}", NewReverseProxyHandlerFunc(targetURL))
-		errC <- http.Serve(lis, accesslog.NewLoggingHandler(rt, HTTPLogger{}))
+		err := http.Serve(lis, accesslog.NewLoggingHandler(rt, HTTPLogger{}))
+		fmt.Printf("http failure\n")
+		errC <- err
 	}()
 	go func() {
-		log.Printf("launch iproxy (udid: %s)", strconv.Quote(udid))
-		c := exec.Command("/usr/local/bin/iproxy", strconv.Itoa(freePort), strconv.Itoa(wdaPort))
-		if udid != "" {
-			c.Args = append(c.Args, udid)
-		}
-		errC <- c.Run()
+	  log.Printf("launch iproxy (udid: %s)", strconv.Quote(udid))
+		
+	  iproxyVersion := iproxy_version()
+	  var c *exec.Cmd
+	  if iproxyVersion == 1 {
+	    c = exec.Command("/usr/local/bin/iproxy", strconv.Itoa(freePort), strconv.Itoa(wdaPort))
+	    if udid != "" {
+        c.Args = append( c.Args, udid )
+      }
+	  } else if iproxyVersion == 2 {
+	    c = exec.Command("/usr/local/bin/iproxy", "-s", "127.0.0.1", strconv.Itoa(freePort) + ":" + strconv.Itoa(wdaPort) )
+	    if udid != "" {
+        c.Args = append( c.Args, "-u", udid )
+      }
+	  }
+	  c.Stdout = os.Stdout
+		c.Stderr = os.Stderr
+		
+		err := c.Run()
+		fmt.Printf("iproxy failure\n")
+		errC <- err
 	}()
 	go func(udid string) {
 		if pWda == "" {
 			return
 		}
 		// device name
-		nameBytes, _ := exec.Command("idevicename", "-u", udid).Output()
+		nameBytes, _ := exec.Command("/usr/local/bin/idevicename", "-u", udid).Output()
 		deviceName := strings.TrimSpace(string(nameBytes))
 		udidNames[udid] = deviceName
 		log.Printf("device name: %s", deviceName)
@@ -233,7 +250,17 @@ func main() {
 	}(udid)
 
 	log.Printf("Open webbrower with http://%s:%d", LocalIP(), lisPort)
-	log.Fatal(<-errC)
+	err2 := <-errC
+	log.Fatalf("error %s\n", err2 )
+}
+
+func iproxy_version() int {
+  output, _ := exec.Command( "/usr/local/bin/iproxy", "-h" ).Output()
+  lines := strings.Split( string(output), "\n" )
+  for _, line := range lines {
+    if strings.Contains( line, "LOCAL_PORT:DEVICE_PORT" ) { return 2 }
+  }
+  return 1
 }
 
 func findXctestrun(folder string) string {
