@@ -74,7 +74,9 @@ func (t *transport) RoundTrip(req *http.Request) (resp *http.Response, err error
 	uri := req.RequestURI
 	
 	var save string = ""
-	if uri != "/screenshot" {
+	if strings.HasSuffix( uri, "/screenshot" ) {
+	  save = "--base64 image--"
+	} else {
 	  save, resp.Body, _ = drainBody(resp.Body)
 	}
 	
