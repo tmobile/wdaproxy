@@ -13,6 +13,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"unicode/utf8"
+	"unicode/utf16"
 
 	"github.com/gorilla/mux"
 	logr "github.com/sirupsen/logrus"
@@ -37,6 +39,33 @@ func drainBody(src io.ReadCloser) (string, io.ReadCloser, error) {
 	}
 	return buf.String(), ioutil.NopCloser(bytes.NewReader(buf.Bytes())), nil
 }
+
+func DecodeUTF16(b []byte) (string, error) {
+
+	if len(b)%2 != 0 {
+		return "", fmt.Errorf("Must have even length byte slice")
+	}
+
+	u16s := make([]uint16, 1)
+
+	ret := &bytes.Buffer{}
+
+	b8buf := make([]byte, 4)
+
+	lb := len(b)
+	for i := 0; i < lb; i += 2 {
+		u16s[0] = uint16(b[i]) + (uint16(b[i+1]) << 8)
+		if u16s[0] <= 255 { // discard multibyte non utf-8 to prevent breaking logrus
+      r := utf16.Decode(u16s)
+      n := utf8.EncodeRune(b8buf, r[0])
+      ret.Write(b8buf[:n])
+    }
+	}
+	
+	return ret.String(), nil
+}
+
+	
 
 func (t *transport) RoundTrip(req *http.Request) (resp *http.Response, err error) {
 	// rewrite url
@@ -80,8 +109,11 @@ func (t *transport) RoundTrip(req *http.Request) (resp *http.Response, err error
 	  save, resp.Body, _ = drainBody(resp.Body)
 	}
 	
+	save, err2 := DecodeUTF16( []byte( save ) )
+	fmt.Printf( "Error:%s\n", err2 )
+	
 	if uri != "/status" {
-   logr.WithFields( logr.Fields{
+    logr.WithFields( logr.Fields{
       "type": "req.done",
       "uri": req.RequestURI,
       "body_out": save,
