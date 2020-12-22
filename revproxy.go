@@ -90,7 +90,7 @@ func (t *transport) RoundTrip(req *http.Request) (resp *http.Response, err error
 		resp.Body.Close()
 		jsonResp.Value["device"] = map[string]interface{}{
 			"udid": udid,
-			"name": udidNames[udid],
+			"name": "whocares",//udidNames[udid],
 		}
 		data, _ := json.Marshal(jsonResp)
 		// update body and fix length
