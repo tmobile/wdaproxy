@@ -19,9 +19,9 @@ import (
 	"github.com/gobuild/log"
 	"github.com/gorilla/mux"
 	accesslog "github.com/mash/go-accesslog"
-	"github.com/nanoscopic/wdaproxy/web"
 	flag "github.com/ogier/pflag"
 	_ "github.com/shurcooL/vfsgen"
+	"github.com/tmobile/wdaproxy/web"
 )
 
 func init() {
@@ -303,12 +303,15 @@ func findXctestrun(folder string) string {
 		findMajor, _ = strconv.ParseInt(parts[0], 10, 64)
 		findMinor, _ = strconv.ParseInt(parts[1], 10, 64)
 		versionMatch = true
+		log.Println("device ios version to target: " + string(parts[0]) + "." + string(parts[1]))
 	}
 
 	xcFile := ""
 	for _, file := range files {
 		if !strings.HasSuffix(file, ".xctestrun") {
 			continue
+		} else {
+			log.Println("found .xctestrun file: " + string(file))
 		}
 
 		if !versionMatch {
@@ -332,6 +335,8 @@ func findXctestrun(folder string) string {
 			curMajor = fileMajor
 			curMinor = fileMinor
 			xcFile = file
+		} else {
+			log.Println(".xctestrun file isn't right")
 		}
 	}
 	return xcFile

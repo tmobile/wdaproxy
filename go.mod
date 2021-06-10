@@ -1,9 +1,9 @@
-module github.com/nanoscopic/wdaproxy
+module github.com/tmobile/wdaproxy
 
 go 1.14
 
 require (
-	github.com/DHowett/go-plist v0.0.0-20170330020707-795cf23fd27f
+	howett.net/plist v0.0.0-20201203080718-1454fab16a06
 	github.com/codeskyblue/muuid v0.0.0-20170401091614-44f8dfd4b3a9
 	github.com/facebookgo/freeport v0.0.0-20150612182905-d4adf43b75b9
 	github.com/gobuild/log v1.0.0

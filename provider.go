@@ -12,11 +12,11 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/gobuild/log"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
-	"github.com/nanoscopic/wdaproxy/connector"
-	"github.com/nanoscopic/wdaproxy/web"
-	"github.com/gobuild/log"
+	"github.com/tmobile/wdaproxy/connector"
+	"github.com/tmobile/wdaproxy/web"
 )
 
 var (

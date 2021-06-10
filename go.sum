@@ -13,8 +13,12 @@ github.com/gorilla/mux v1.3.1-0.20170228224354-599cba5e7b61 h1:fgQcA2gW8X1dLTYea
 github.com/gorilla/mux v1.3.1-0.20170228224354-599cba5e7b61/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
 github.com/gorilla/websocket v1.1.1-0.20170319172727-a91eba7f9777 h1:2Wp9JIvcGxCnl0ju03V2uMMLBwP/NXsgc/U8qwb/rp8=
 github.com/gorilla/websocket v1.1.1-0.20170319172727-a91eba7f9777/go.mod h1:E7qHFY5m1UJ88s3WnNqhKjPHQ0heANvMoAMk2YaljkQ=
+github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/konsorten/go-windows-terminal-sequences v1.0.3 h1:CE8S1cTafDpPvMhIxNJKvHsGVBgn1xWYf1NbHQhywc8=
 github.com/konsorten/go-windows-terminal-sequences v1.0.3/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
+github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
+github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
+github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/mash/go-accesslog v0.0.0-20151029030928-9ba8e13f3608 h1:wL/8tiGL5rdQt/6NS2E+arg3Vrz2u8qYJPA5nyNnaZk=
 github.com/mash/go-accesslog v0.0.0-20151029030928-9ba8e13f3608/go.mod h1:5JLTyA+23fYz/BfD5Hn736mGEZopzWtEx1pdNfnTp8k=
 github.com/ogier/pflag v0.0.2-0.20160129220114-45c278ab3607 h1:xZoOomu8/sOa+6Q469LrXeyq2YsmkhZo8wU6EzNWMDg=
@@ -35,3 +39,8 @@ golang.org/x/sys v0.0.0-20190422165155-953cdadca894 h1:Cz4ceDQGXuKRnVBDTS23GTn/p
 golang.org/x/sys v0.0.0-20190422165155-953cdadca894/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/tools v0.0.0-20170406185716-24acc66eabea h1:sT0fjJ8Yb5TBkUlDYdqPBJHqRvPDYNEHbFmmOBjrBos=
 golang.org/x/tools v0.0.0-20170406185716-24acc66eabea/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
+gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+gopkg.in/yaml.v2 v2.2.1/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
+howett.net/plist v0.0.0-20201203080718-1454fab16a06 h1:QDxUo/w2COstK1wIBYpzQlHX/NqaQTcf9jyz347nI58=
+howett.net/plist v0.0.0-20201203080718-1454fab16a06/go.mod h1:vMygbs4qMhSZSc4lCUl2OEE+rDiIIJAIdR4m7MiMcm0=
